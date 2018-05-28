@@ -2,28 +2,6 @@ provider "aws" {
   region = "${var.aws_region}"
 }
 
-data "aws_ami" "jenkins" {
-  most_recent      = true
-
-  # If we change the AWS Account in which test are run, update this value.
-  owners  = ["312506926764"]
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  filter {
-    name   = "is-public"
-    values = ["false"] // flip to public when ready for release
-  }
-
-  filter {
-    name   = "name"
-    values = ["jenkins-amazon-linux-*"]
-  }
-}
-
 # Jenkins Master Instance
 module "jenkins-master" {
   source                      = "./modules/jenkins-master"
@@ -34,9 +12,9 @@ module "jenkins-master" {
   alb_prefix                  = "${var.name == "" ? "jenkins" : join("-", list(var.name, "jenkins"))}"
   instance_type               = "${var.instance_type_master}"
 
-  ami_id                      = "${var.master_ami_id == "" ? data.aws_ami.jenkins.image_id : var.master_ami_id}"
   user_data                   = ""
   setup_data                  = "${data.template_file.setup_data_master.rendered}"
+  ami_id                      = "${var.master_ami_id}"
 
   http_port                   = "${var.http_port}"
   allowed_ssh_cidr_blocks     = ["0.0.0.0/0"]
