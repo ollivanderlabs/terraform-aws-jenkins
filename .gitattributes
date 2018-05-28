@@ -12,7 +12,7 @@
 
 # source code
 *.tf text
-*.tpl test
+*.tpl text
 *.json text
 *.htm text
 *.html text
